@@ -1,0 +1,2 @@
+start_timestamp,end_timestamp,total_buildings,total_sensors,total_sensor_readings,total_energy_kwh,avg_sensor_power_kw,peak_sensor_power_kw,avg_voltage,avg_power_factor,avg_temperature
+2026-01-01 00:00:00.000,2026-06-30 23:00:00.000,10,50,215045,420437.62,1.955,4.968,230.01,0.85,10.05

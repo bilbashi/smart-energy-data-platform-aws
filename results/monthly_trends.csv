@@ -1,0 +1,7 @@
+year,month,month_name,total_sensor_readings,total_energy_kwh,avg_building_daily_energy_kwh,avg_sensor_power_kw,avg_temperature
+2026,1,January,36818,72169.22,232.8,1.96,10.06
+2026,2,February,33286,65512.98,233.98,1.968,10.06
+2026,3,March,36818,71676.1,231.21,1.947,9.95
+2026,4,April,35649,69602.21,232.01,1.952,10.01
+2026,5,May,36844,71902.19,231.94,1.951,10.09
+2026,6,June,35630,69574.87,231.92,1.953,10.12
