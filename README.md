@@ -2,7 +2,7 @@
 
 An end-to-end cloud data engineering project that ingests synthetic smart-energy sensor data, validates and cleans it with AWS Glue and PySpark, stores analytics-ready data in Parquet, and queries curated datasets with Amazon Athena.
 
-The project is an AWS version of an earlier local/DataLab pipeline, rebuilt to demonstrate cloud storage, cataloguing, ETL, data-quality validation, columnar storage and SQL analytics.
+This project is an AWS version of an earlier local/DataLab pipeline, rebuilt to demonstrate cloud storage, cataloguing, ETL, data-quality validation, columnar storage and SQL analytics.
 
 ## Architecture
 
@@ -160,6 +160,43 @@ Building energy consumption was tightly clustered. **B02** recorded the highest 
 
 The synthetic dataset shows no strong or consistent weekday/weekend effect. The largest positive weekend difference was **B09 (+1.29%)**, while the largest decrease was **B03 (-1.28%)**.
 
+## How to Reproduce
+
+1. Create an S3 bucket and upload the raw CSV to:
+
+```text
+s3://<your-bucket-name>/raw/
+```
+
+2. Create an AWS Glue crawler for the `raw/` prefix and catalog it in:
+
+```text
+smart_energy_db.raw
+```
+
+3. Create an AWS Glue Spark job using:
+
+```text
+glue/smart_energy_cleaning_job.py
+```
+
+4. Add this Glue job parameter:
+
+```text
+--OUTPUT_PATH
+s3://<your-bucket-name>/processed/
+```
+
+5. Run the Glue job, then crawl the processed Parquet output into:
+
+```text
+smart_energy_db.processed
+```
+
+6. Run the SQL files in `sql/` in numerical order. The first three create the curated Parquet tables; the remaining files run validation and analysis queries.
+
+7. Export the final Athena query outputs if you want to recreate the README charts.
+
 ## SQL
 
 The [`sql/`](sql/) directory contains the Athena SQL used to build and analyse the curated layer:
@@ -178,7 +215,7 @@ The [`sql/`](sql/) directory contains the Athena SQL used to build and analyse t
 ## Repository Structure
 
 ```text
-smart-energy-data-platform/
+smart-energy-data-platform-aws/
 ├── glue/
 │   └── smart_energy_cleaning_job.py
 ├── sql/
@@ -214,9 +251,9 @@ s3://<your-bucket-name>/processed/
 
 instead of the real S3 bucket name or AWS account-specific identifiers.
 
-An S3 bucket name is **not a credential and does not grant access by itself**. However, account-regional bucket names can contain account-identifying information. Replacing these values with placeholders is therefore used here as sensible privacy and security hygiene.
+An S3 bucket name is **not a credential and does not grant access by itself**. However, account-regional bucket names can contain account-identifying information. Replacing these values with placeholders is used here as sensible privacy and security hygiene.
 
-The public Glue script also accepts the processed S3 path through the `--OUTPUT_PATH` job parameter rather than hard-coding an account-specific bucket name.
+The public Glue script accepts the processed S3 path through the `--OUTPUT_PATH` job parameter rather than hard-coding an account-specific bucket name.
 
 Do not commit AWS access keys, secret access keys, session tokens, passwords, MFA codes or other credentials to a public repository.
 
