@@ -91,7 +91,7 @@ The job:
 - rebuilds `building_id` from `sensor_id`
 - removes duplicate `(timestamp, sensor_id)` readings
 - validates voltage, current, power factor and temperature
-- imputes invalid/missing measurements using sensor medians with an overall-median fallback
+- imputes invalid or missing measurements using sensor medians with an overall-median fallback
 - recalculates `power_kw` and `energy_kwh`
 - writes the cleaned dataset as Parquet
 
@@ -124,6 +124,26 @@ The raw and processed datasets were checked in Athena.
 | Invalid temperatures | — | 0 |
 
 \*436 negative-energy readings and 436 extreme-energy readings were identified in the raw layer.
+
+## AWS Implementation
+
+### S3 Data Lake Structure
+
+The project uses separate S3 prefixes for raw ingestion, processed Parquet data, curated analytics datasets and Athena query results.
+
+![S3 Data Lake Structure](images/aws/s3_data_layers.png)
+
+### AWS Glue ETL Job
+
+The PySpark cleaning job successfully transforms the raw dataset into the processed Parquet layer.
+
+![AWS Glue Job Success](images/aws/glue_job_success.png)
+
+### Athena Data Quality Validation
+
+The processed dataset contains **215,045 clean sensor readings** with no remaining missing values, invalid measurements or duplicate `(timestamp, sensor_id)` groups.
+
+![Athena Data Quality Validation](images/aws/athena_data_quality.png)
 
 ## Overall KPIs
 
@@ -168,7 +188,7 @@ The synthetic dataset shows no strong or consistent weekday/weekend effect. The 
 s3://<your-bucket-name>/raw/
 ```
 
-2. Create an AWS Glue crawler for the `raw/` prefix and catalog it in:
+2. Create an AWS Glue crawler for the `raw/` prefix and catalog it as:
 
 ```text
 smart_energy_db.raw
@@ -193,7 +213,7 @@ s3://<your-bucket-name>/processed/
 smart_energy_db.processed
 ```
 
-6. Run the SQL files in `sql/` in numerical order. The first three create the curated Parquet tables; the remaining files run validation and analysis queries.
+6. Run the SQL files in `sql/` in numerical order. The first three create the curated Parquet tables; the remaining files perform validation and analysis.
 
 7. Export the final Athena query outputs if you want to recreate the README charts.
 
@@ -235,9 +255,14 @@ smart-energy-data-platform-aws/
 │   ├── monthly_trends.csv
 │   └── weekday_weekend_analysis.csv
 ├── images/
+│   ├── aws/
+│   │   ├── s3_data_layers.png
+│   │   ├── glue_job_success.png
+│   │   └── athena_data_quality.png
 │   ├── monthly_energy_trend.png
 │   ├── building_energy_consumption.png
 │   └── weekday_weekend_energy.png
+├── LICENSE
 └── README.md
 ```
 
